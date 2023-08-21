@@ -38,8 +38,22 @@ class Graph_Widget {
 		// Hook into the 'admin_enqueue_scripts' action to enqueue necessary scripts for the admin area.
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 
+		// Add all required files.
+		spl_autoload_register( array( $this, 'graph_widget_autoloader' ) );
 		// Hook into the 'wp_dashboard_setup' action to add a custom dashboard widget.
 		add_action( 'wp_dashboard_setup', array( $this, 'add_graph_widget' ) );
+
+	}
+		/**
+		 * Initialize the plugin.
+		 *
+		 * This static method creates an instance of the current class to start the rest api functionality.
+		 *
+		 * @static
+		 */
+	public static function init() {
+		$class = __CLASS__;
+		new $class();
 	}
 	/**
 	 * Activate function for the graph widget.
@@ -167,55 +181,55 @@ class Graph_Widget {
 				'fees'     => 1600,
 			),
 			array(
-				'date'     => '2023-07-03',
+				'date'     => '2023-08-03',
 				'name'     => 'php',
 				'students' => 80,
 				'fees'     => 1600,
 			),
 			array(
-				'date'     => '2023-07-04',
+				'date'     => '2023-08-04',
 				'name'     => 'react',
 				'students' => 420,
 				'fees'     => 2800,
 			),
 			array(
-				'date'     => '2023-07-07',
+				'date'     => '2023-08-08',
 				'name'     => 'python',
 				'students' => 240,
 				'fees'     => 4200,
 			),
 			array(
-				'date'     => '2023-07-06',
+				'date'     => '2023-08-06',
 				'name'     => 'javascript',
 				'students' => 390,
 				'fees'     => 2200,
 			),
 			array(
-				'date'     => '2023-07-07',
+				'date'     => '2023-08-08',
 				'name'     => 'c++',
 				'students' => 280,
 				'fees'     => 4500,
 			),
 			array(
-				'date'     => '2023-07-08',
+				'date'     => '2023-08-08',
 				'name'     => 'html',
 				'students' => 170,
 				'fees'     => 3000,
 			),
 			array(
-				'date'     => '2023-07-09',
+				'date'     => '2023-08-09',
 				'name'     => 'css',
 				'students' => 110,
 				'fees'     => 2000,
 			),
 			array(
-				'date'     => '2023-07-10',
+				'date'     => '2023-08-10',
 				'name'     => 'sql',
 				'students' => 320,
 				'fees'     => 5200,
 			),
 			array(
-				'date'     => '2023-07-11',
+				'date'     => '2023-08-11',
 				'name'     => 'flutter',
 				'students' => 420,
 				'fees'     => 6000,
@@ -239,19 +253,19 @@ class Graph_Widget {
 				'fees'     => 2200,
 			),
 			array(
-				'date'     => '2023-07-15',
+				'date'     => '2023-08-15',
 				'name'     => 'scala',
 				'students' => 130,
 				'fees'     => 2400,
 			),
 			array(
-				'date'     => '2023-07-16',
+				'date'     => '2023-08-16',
 				'name'     => 'go',
 				'students' => 140,
 				'fees'     => 2600,
 			),
 			array(
-				'date'     => '2023-07-20',
+				'date'     => '2023-08-20',
 				'name'     => 'java',
 				'students' => 190,
 				'fees'     => 3800,
@@ -272,8 +286,6 @@ class Graph_Widget {
 
 		// Define the plugin directory URL.
 		define( 'GRAPH_WIDGET_URL', plugin_dir_url( __FILE__ ) );
-		// Include the api.php file.
-		require_once GRAPH_WIDGET_DIR . '/includes/class-graph-widget-api.php';
 	}
 	/**
 	 * Enqueue ReactJS script and pass data to it using wp_localize_script.
@@ -294,15 +306,11 @@ class Graph_Widget {
 		}
 
 		// Enqueue 'graph-widget-script' with its source, version, and set to load in the footer.
-		wp_enqueue_script( 'graph-widget-script', GRAPH_WIDGET_URL . 'js/main.js', '', '1.0', true );
+		wp_enqueue_script( 'graph-widget-script', GRAPH_WIDGET_URL . 'js/main.js', '', '1.9', true );
 
 		// Data to pass to the ReactJS script using wp_localize_script.
 		$data_to_pass = array(
 			'site_url'            => site_url(),
-			'last_7_days'         => __( 'Last 7 days', 'text-domain' ), // Translated string for "Last 7 days".
-			'last_15_days'        => __( 'Last 15 days', 'text-domain' ), // Translated string for "Last 15 days".
-			'last_1_month'        => __( 'Last 1 month', 'text-domain' ), // Translated string for "Last 1 month".
-			'error_fetching_data' => __( 'Error fetching data', 'text-domain' ), // Translated string for "Error fetching data".
 		);
 
 		// Pass the data to the ReactJS script under the variable 'graph_widget_data'.
@@ -330,7 +338,19 @@ class Graph_Widget {
 			array( $this, 'graph_widget' )
 		);
 	}
+	/**
+	 * Autoloader function to automatically load classes as they're used.
+	 *
+	 * @param string $class_name The name of the class to load.
+	 */
+	public function graph_widget_autoloader( $class_name ) {
+		$class_path = GRAPH_WIDGET_DIR . 'includes/' . $class_name . '.php';
+		if ( file_exists( $class_path ) ) {
+			require_once $class_path;
+		}
+	}
 }
 
 // Instantiate the class to initialize the plugin.
 new Graph_Widget();
+add_action( 'plugins_loaded', array( 'Graph_Widget_Api', 'init' ) );
