@@ -42,7 +42,7 @@ class Graph_Widget {
 		spl_autoload_register( array( $this, 'graph_widget_autoloader' ) );
 		// Hook into the 'wp_dashboard_setup' action to add a custom dashboard widget.
 		add_action( 'wp_dashboard_setup', array( $this, 'add_graph_widget' ) );
-
+		add_action( 'plugins_loaded', array( 'Graph_Widget_Api', 'init' ) );
 	}
 		/**
 		 * Initialize the plugin.
@@ -353,4 +353,4 @@ class Graph_Widget {
 
 // Instantiate the class to initialize the plugin.
 new Graph_Widget();
-add_action( 'plugins_loaded', array( 'Graph_Widget_Api', 'init' ) );
+
